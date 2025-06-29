@@ -24,7 +24,7 @@
         min-height: 100vh;
         background-color: #ffe6e9; /* Açık pembe arka plan */
         font-family: 'Quicksand', sans-serif;
-        overflow: hidden;
+        overflow: hidden; /* Taşmayı engeller */
       }
 
       .container {
@@ -127,8 +127,6 @@
         padding: 0 10px;
       }
 
-      /* Kalp yükleyici stilleri tamamen kaldırıldı */
-
       /* Küçük ekranlar (mobil) için medya sorguları */
       @media (max-width: 768px) {
         .question {
@@ -179,6 +177,44 @@
       <h2>Yuppi Beni Sevdiğini Biliyordum😍!</h2>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+      const questionContainer = document.querySelector(".question-container");
+      const resultContainer = document.querySelector(".result-container");
+      const gifResult = document.querySelector(".gif-result");
+      // const heartLoader = document.querySelector(".cssload-main"); // Bu satır kaldırıldı
+      const yesBtn = document.querySelector(".js-yes-btn");
+      const noBtn = document.querySelector(".js-no-btn");
+
+      // "Hayır" düğmesinin pozisyonunu rastgele değiştiren fonksiyon
+      const moveNoButton = () => {
+        const containerRect = questionContainer.getBoundingClientRect();
+        const noBtnRect = noBtn.getBoundingClientRect();
+
+        const maxX = containerRect.width - noBtnRect.width - 20;
+        const maxY = containerRect.height - noBtnRect.height - 20;
+
+        const newX = Math.random() * maxX;
+        const newY = Math.random() * maxY;
+
+        noBtn.style.position = 'absolute';
+        noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
+      };
+
+      // "Hayır" düğmesine fare üzerine gelince ve dokununca kaçma özelliği
+      noBtn.addEventListener("mouseover", moveNoButton);
+      noBtn.addEventListener("touchstart", moveNoButton);
+
+      // "Evet" düğmesi işlevi
+      yesBtn.addEventListener("click", () => {
+        questionContainer.style.display = "none";
+        // Kalp yükleyiciyi gösterme adımı kaldırıldı
+        resultContainer.style.display = "flex"; // Doğrudan sonuç konteynırını göster
+
+        // gifResult varsa ve 'play' metodu destekliyorsa oynat
+        if (gifResult && typeof gifResult.play === 'function') {
+          gifResult.play();
+        }
+      });
+    </script>
   </body>
 </html>
