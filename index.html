@@ -24,7 +24,8 @@
         min-height: 100vh;
         background-color: #ffe6e9; /* Açık pembe arka plan */
         font-family: 'Quicksand', sans-serif;
-        overflow: hidden; /* Taşmayı engeller */
+        /* BURASI ÖNEMLİ: Sayfanın kaydırılmasını engeller */
+        overflow: hidden; 
       }
 
       .container {
@@ -46,6 +47,8 @@
         gap: 20px;
         position: relative; /* "Hayır" butonu için gerekli */
         width: 100%;
+        /* question-container'ın yüksekliğini de sınırlayalım ki buton içinde kalsın */
+        min-height: 300px; /* İçeriğe göre ayarlanabilir, butonun kaçabileceği alanı belirler */
       }
 
       .question-container img {
@@ -100,6 +103,7 @@
         position: static;
       }
 
+      /* "Hayır" butonu hareket ederken bu sınıf JS tarafından eklenecek */
       .no-btn.is-moving {
         position: absolute;
       }
@@ -146,6 +150,10 @@
           flex-direction: column;
           gap: 10px;
         }
+        /* Mobil cihazlarda question-container'ın yüksekliğini ayarlayabiliriz */
+        .question-container {
+          min-height: 250px; /* Daha küçük ekranlar için */
+        }
       }
 
       @media (max-width: 480px) {
@@ -158,6 +166,9 @@
         .btn {
           padding: 8px 15px;
           font-size: 0.9em;
+        }
+        .question-container {
+          min-height: 200px; /* Daha küçük ekranlar için */
         }
       }
     </style>
@@ -181,21 +192,26 @@
       const questionContainer = document.querySelector(".question-container");
       const resultContainer = document.querySelector(".result-container");
       const gifResult = document.querySelector(".gif-result");
-      // const heartLoader = document.querySelector(".cssload-main"); // Bu satır kaldırıldı
       const yesBtn = document.querySelector(".js-yes-btn");
       const noBtn = document.querySelector(".js-no-btn");
 
       // "Hayır" düğmesinin pozisyonunu rastgele değiştiren fonksiyon
       const moveNoButton = () => {
+        // questionContainer'ın güncel boyutlarını ve konumunu al
         const containerRect = questionContainer.getBoundingClientRect();
+        // noBtn'in güncel boyutlarını al
         const noBtnRect = noBtn.getBoundingClientRect();
 
-        const maxX = containerRect.width - noBtnRect.width - 20;
-        const maxY = containerRect.height - noBtnRect.height - 20;
+        // Butonun hareket edebileceği maksimum X ve Y koordinatlarını hesapla.
+        // Bu hesaplama, butonun container içinde kalmasını garanti eder.
+        const maxX = containerRect.width - noBtnRect.width;
+        const maxY = containerRect.height - noBtnRect.height;
 
-        const newX = Math.random() * maxX;
-        const newY = Math.random() * maxY;
+        // Yeni rastgele konumlar (0 ile maxX/maxY arasında)
+        const newX = Math.max(0, Math.random() * maxX);
+        const newY = Math.max(0, Math.random() * maxY);
 
+        // Butonun pozisyonunu güncelliyoruz
         noBtn.style.position = 'absolute';
         noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
       };
@@ -207,14 +223,19 @@
       // "Evet" düğmesi işlevi
       yesBtn.addEventListener("click", () => {
         questionContainer.style.display = "none";
-        // Kalp yükleyiciyi gösterme adımı kaldırıldı
-        resultContainer.style.display = "flex"; // Doğrudan sonuç konteynırını göster
+        resultContainer.style.display = "flex";
 
-        // gifResult varsa ve 'play' metodu destekliyorsa oynat
         if (gifResult && typeof gifResult.play === 'function') {
           gifResult.play();
         }
       });
+
+      // Sayfa yüklendiğinde ve ekran boyutu değiştiğinde (mobil klavye açılması gibi)
+      // butonun pozisyonunu yeniden ayarlamak için bir olay dinleyicisi ekleyebiliriz.
+      window.addEventListener('resize', moveNoButton);
+
+      // Sayfa yüklendiğinde butonun başlangıç pozisyonunu da ayarlayalım
+      document.addEventListener('DOMContentLoaded', moveNoButton);
     </script>
   </body>
 </html>
