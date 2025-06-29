@@ -11,15 +11,20 @@
     <title>Beni Seviyor musun?</title>
     <style>
       /* Genel Sıfırlamalar ve Temel Stil */
-      body {
+      * {
+        padding: 0;
         margin: 0;
-        font-family: 'Quicksand', sans-serif;
+        box-sizing: border-box;
+      }
+
+      body {
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        background-color: #fce4ec; /* Açık pembe arka plan */
-        overflow: hidden; /* Taşmayı engellemek için */
+        background-color: #ffe6e9; /* Açık pembe arka plan */
+        font-family: 'Quicksand', sans-serif;
+        overflow: hidden;
       }
 
       .container {
@@ -28,178 +33,133 @@
         background-color: #fff;
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        max-width: 90%; /* Mobil ekranlarda daha iyi görünüm */
-        width: 400px; /* Sabit genişlik yerine maksimum genişlik */
-        box-sizing: border-box; /* Padding'in genişliğe dahil olmasını sağlar */
+        max-width: 90%;
+        width: 400px;
+        box-sizing: border-box;
       }
 
       .question-container {
         display: flex;
-        flex-direction: column; /* Mobil için dikey hizalama */
+        flex-direction: column;
         align-items: center;
-        gap: 20px; /* Öğeler arasında boşluk */
+        justify-content: center;
+        gap: 20px;
+        position: relative; /* "Hayır" butonu için gerekli */
+        width: 100%;
       }
 
       .question-container img {
-        max-width: 150px; /* Resim boyutunu küçült */
+        max-width: 150px;
         height: auto;
-        border-radius: 10px; /* Hafif yuvarlak köşeler */
+        border-radius: 10px;
+        margin-bottom: 0;
       }
 
       .question {
-        color: #e91e63; /* Pembe renk */
-        font-size: 1.8em; /* Daha büyük ve okunaklı font */
-        margin-bottom: 15px;
+        color: #e91e63;
+        font-size: 2em;
+        margin-bottom: 0;
+        text-align: center;
+        padding: 0 10px;
       }
 
       .button-container {
         display: flex;
-        flex-direction: column; /* Butonları alt alta sırala */
-        gap: 15px; /* Butonlar arasında boşluk */
-        width: 100%; /* Konteynırın genişliğine yay */
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        position: relative;
+        margin-top: 15px;
       }
 
       .btn {
-        padding: 15px 25px;
         border: none;
-        border-radius: 8px;
+        border-radius: 50px;
+        padding: 12px 25px;
+        font-family: "Quicksand", sans-serif;
         font-size: 1.1em;
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        width: 100%; /* Mobil cihazlarda tam genişlikte butonlar */
+        transition: all 0.3s ease;
+        background-color: #ff6b81;
+        color: white;
+        transform: scale(1);
+        box-shadow: 0px 4px 15px rgba(255, 107, 129, 0.5);
+        width: 100%;
         box-sizing: border-box;
       }
 
-      .yes-btn {
-        background-color: #4CAF50; /* Yeşil */
-        color: white;
+      .btn:hover {
+        background-color: #ffa4b1;
+        transform: scale(1.05);
+        box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
+        text-shadow: 1px 1px 5px rgba(255, 182, 193, 0.8);
       }
 
-      .yes-btn:hover {
-        background-color: #45a049;
-        transform: translateY(-2px);
-      }
-
+      .yes-btn,
       .no-btn {
-        background-color: #f44336; /* Kırmızı */
-        color: white;
+        position: static;
       }
 
-      .no-btn:hover {
-        background-color: #e53935;
-        transform: translateY(-2px);
+      .no-btn.is-moving {
+        position: absolute;
       }
 
       .result-container {
         display: none; /* Başlangıçta gizli */
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 20px;
+        width: 100%;
       }
 
-      .result-container .gif-result {
+      .gif-result {
         max-width: 200px;
         height: auto;
         border-radius: 10px;
+        margin-bottom: 0;
       }
 
       .result-container h2 {
         color: #e91e63;
-        font-size: 1.5em;
+        font-size: 1.8em;
+        text-align: center;
+        padding: 0 10px;
       }
 
-      /* CSS Sinyal Animasyonu (İsterseniz kaldırabilirsiniz) */
-      .cssload-main {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0; /* Başlangıçta gizli */
-        pointer-events: none; /* Tıklamayı engelle */
-      }
+      /* Kalp yükleyici stilleri tamamen kaldırıldı */
 
-      /* Animasyon detayları burada kalabilir, ancak mobil cihazlarda performans için optimize edilebilir */
-      .cssload-heart {
-        position: relative;
-        width: 100px;
-        height: 90px;
-        animation: cssload-heart 1.73s ease-in infinite;
-      }
-      .cssload-heartL,
-      .cssload-heartR {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        width: 50px;
-        height: 80px;
-        background-color: #e91e63;
-        border-radius: 50px 50px 0 0;
-        transform-origin: 0 100%;
-      }
-      .cssload-heartL {
-        transform: rotate(-45deg);
-      }
-      .cssload-heartR {
-        left: 0;
-        transform: rotate(45deg);
-      }
-      .cssload-square {
-        position: absolute;
-        top: 35px;
-        left: 25px;
-        width: 50px;
-        height: 50px;
-        background-color: #e91e63;
-        transform: rotate(-45deg);
-      }
-      .cssload-shadow {
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        width: 100px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: rgba(0, 0, 0, 0.1);
-        transform: translateX(-50%) scaleY(0.7);
-        animation: cssload-shadow 1.73s ease-in infinite;
-      }
-
-      @keyframes cssload-heart {
-        0% {
-          transform: scale(0.6);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(0.6);
-        }
-      }
-      @keyframes cssload-shadow {
-        0% {
-          transform: translateX(-50%) scale(1);
-        }
-        50% {
-          transform: translateX(-50%) scale(0.8);
-        }
-        100% {
-          transform: translateX(-50%) scale(1);
-        }
-      }
-
-      /* Küçük ekranlar (mobil) için özel stil */
-      @media (max-width: 600px) {
+      /* Küçük ekranlar (mobil) için medya sorguları */
+      @media (max-width: 768px) {
         .question {
-          font-size: 1.5em; /* Mobil ekranlarda daha küçük font */
+          font-size: 1.7em;
         }
 
         .btn {
-          font-size: 1em; /* Mobil buton font boyutu */
-          padding: 12px 20px;
+          font-size: 1em;
+          padding: 10px 20px;
         }
 
         .result-container h2 {
+          font-size: 1.5em;
+        }
+
+        .button-container {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .question {
+          font-size: 1.5em;
+        }
+        .result-container h2 {
           font-size: 1.3em;
+        }
+        .btn {
+          padding: 8px 15px;
+          font-size: 0.9em;
         }
       }
     </style>
@@ -219,49 +179,6 @@
       <h2>Yuppi Beni Sevdiğini Biliyordum😍!</h2>
     </div>
 
-    <div class="cssload-main">
-      <div class="cssload-heart">
-        <span class="cssload-heartL"></span>
-        <span class="cssload-heartR"></span>
-        <span class="cssload-square"></span>
-      </div>
-      <div class="cssload-shadow"></div>
-    </div>
-
-    <script>
-      const yesBtn = document.querySelector('.js-yes-btn');
-      const noBtn = document.querySelector('.js-no-btn');
-      const questionContainer = document.querySelector('.question-container');
-      const resultContainer = document.querySelector('.result-container');
-      const cssloadMain = document.querySelector('.cssload-main');
-
-      // "Hayır" butonunun pozisyonunu rastgele değiştirecek fonksiyon
-      const moveNoButton = () => {
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const noBtnRect = noBtn.getBoundingClientRect(); // Butonun mevcut boyutları
-
-        // Butonun ekran dışına çıkmamasını sağlamak için yeni sınırlar
-        const maxX = viewportWidth - noBtnRect.width - 20; // 20px sağdan boşluk
-        const maxY = viewportHeight - noBtnRect.height - 20; // 20px aşağıdan boşluk
-
-        const newX = Math.random() * maxX;
-        const newY = Math.random() * maxY;
-
-        noBtn.style.position = 'absolute'; // Butonu konumlandırmak için
-        noBtn.style.left = `${newX}px`;
-        noBtn.style.top = `${newY}px`;
-      };
-
-      yesBtn.addEventListener('click', () => {
-        questionContainer.style.display = 'none';
-        resultContainer.style.display = 'flex'; // Flexbox olarak göster
-        cssloadMain.style.opacity = '1'; // Animasyonu göster
-        cssloadMain.style.pointerEvents = 'auto'; // Animasyona tıklamayı etkinleştir (isteğe bağlı)
-      });
-
-      noBtn.addEventListener('mouseover', moveNoButton); // Fare üzerine gelince
-      noBtn.addEventListener('touchstart', moveNoButton); // Dokunmatik cihazlar için
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
