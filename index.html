@@ -24,8 +24,7 @@
         min-height: 100vh;
         background-color: #ffe6e9; /* Açık pembe arka plan */
         font-family: 'Quicksand', sans-serif;
-        /* BURASI ÖNEMLİ: Sayfanın kaydırılmasını engeller */
-        overflow: hidden; 
+        overflow: hidden; /* Sayfanın kaydırılmasını tamamen engeller */
       }
 
       .container {
@@ -34,8 +33,8 @@
         background-color: #fff;
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        max-width: 90%;
-        width: 400px;
+        max-width: 90%; /* Ekran genişliğinin %90'ını kaplar */
+        width: 400px; /* Maksimum 400px genişlik */
         box-sizing: border-box;
       }
 
@@ -45,10 +44,10 @@
         align-items: center;
         justify-content: center;
         gap: 20px;
-        position: relative; /* "Hayır" butonu için gerekli */
+        position: relative; /* Çocuk elementlerin (butonun) konumlandırması için gerekli */
         width: 100%;
-        /* question-container'ın yüksekliğini de sınırlayalım ki buton içinde kalsın */
-        min-height: 300px; /* İçeriğe göre ayarlanabilir, butonun kaçabileceği alanı belirler */
+        /* Butonun hareket alanı için minimum yükseklik belirleyelim */
+        min-height: 350px; /* Bu değeri içeriğe göre ayarlayabilirsiniz */
       }
 
       .question-container img {
@@ -71,8 +70,9 @@
         flex-direction: column;
         gap: 15px;
         width: 100%;
-        position: relative;
+        position: relative; /* İçindeki 'no-btn' için relative */
         margin-top: 15px;
+        z-index: 1; /* Butonların img'nin üzerinde kalmasını sağlamak için */
       }
 
       .btn {
@@ -98,15 +98,22 @@
         text-shadow: 1px 1px 5px rgba(255, 182, 193, 0.8);
       }
 
-      .yes-btn,
+      /* Hayır butonu için özel stil (başlangıçta statik, JavaScript ile absolute olacak) */
       .no-btn {
-        position: static;
+        /* Başlangıçta flex akışına göre yerleşir */
+        position: static; 
+        transition: transform 0.1s ease-out; /* Hareket ederken daha yumuşak geçiş */
+      }
+      
+      /* JavaScript butonu hareket ettirdiğinde bu sınıfı ekleyecek */
+      .no-btn.is-absolute-positioned {
+          position: absolute;
+          /* Başlangıçta bulunduğu yerde kalması için */
+          left: 50%;
+          top: 50%; 
+          transform: translate(-50%, -50%);
       }
 
-      /* "Hayır" butonu hareket ederken bu sınıf JS tarafından eklenecek */
-      .no-btn.is-moving {
-        position: absolute;
-      }
 
       .result-container {
         display: none; /* Başlangıçta gizli */
@@ -150,9 +157,8 @@
           flex-direction: column;
           gap: 10px;
         }
-        /* Mobil cihazlarda question-container'ın yüksekliğini ayarlayabiliriz */
         .question-container {
-          min-height: 250px; /* Daha küçük ekranlar için */
+          min-height: 300px; /* Mobil için minimum yükseklik */
         }
       }
 
@@ -168,7 +174,7 @@
           font-size: 0.9em;
         }
         .question-container {
-          min-height: 200px; /* Daha küçük ekranlar için */
+          min-height: 280px; /* Daha küçük mobil ekranlar için minimum yükseklik */
         }
       }
     </style>
@@ -188,54 +194,6 @@
       <h2>Yuppi Beni Sevdiğini Biliyordum😍!</h2>
     </div>
 
-    <script>
-      const questionContainer = document.querySelector(".question-container");
-      const resultContainer = document.querySelector(".result-container");
-      const gifResult = document.querySelector(".gif-result");
-      const yesBtn = document.querySelector(".js-yes-btn");
-      const noBtn = document.querySelector(".js-no-btn");
-
-      // "Hayır" düğmesinin pozisyonunu rastgele değiştiren fonksiyon
-      const moveNoButton = () => {
-        // questionContainer'ın güncel boyutlarını ve konumunu al
-        const containerRect = questionContainer.getBoundingClientRect();
-        // noBtn'in güncel boyutlarını al
-        const noBtnRect = noBtn.getBoundingClientRect();
-
-        // Butonun hareket edebileceği maksimum X ve Y koordinatlarını hesapla.
-        // Bu hesaplama, butonun container içinde kalmasını garanti eder.
-        const maxX = containerRect.width - noBtnRect.width;
-        const maxY = containerRect.height - noBtnRect.height;
-
-        // Yeni rastgele konumlar (0 ile maxX/maxY arasında)
-        const newX = Math.max(0, Math.random() * maxX);
-        const newY = Math.max(0, Math.random() * maxY);
-
-        // Butonun pozisyonunu güncelliyoruz
-        noBtn.style.position = 'absolute';
-        noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
-      };
-
-      // "Hayır" düğmesine fare üzerine gelince ve dokununca kaçma özelliği
-      noBtn.addEventListener("mouseover", moveNoButton);
-      noBtn.addEventListener("touchstart", moveNoButton);
-
-      // "Evet" düğmesi işlevi
-      yesBtn.addEventListener("click", () => {
-        questionContainer.style.display = "none";
-        resultContainer.style.display = "flex";
-
-        if (gifResult && typeof gifResult.play === 'function') {
-          gifResult.play();
-        }
-      });
-
-      // Sayfa yüklendiğinde ve ekran boyutu değiştiğinde (mobil klavye açılması gibi)
-      // butonun pozisyonunu yeniden ayarlamak için bir olay dinleyicisi ekleyebiliriz.
-      window.addEventListener('resize', moveNoButton);
-
-      // Sayfa yüklendiğinde butonun başlangıç pozisyonunu da ayarlayalım
-      document.addEventListener('DOMContentLoaded', moveNoButton);
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
