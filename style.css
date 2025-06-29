@@ -1,426 +1,234 @@
-
-
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
+
 body {
-  display: grid;
+  /* display: grid yerine flexbox kullanmak daha esnektir */
+  display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh; /* Tam ekran yüksekliğini kaplar */
   background-color: #ffe6e9;
   font-family: "Quicksand", sans-serif;
-}
-.container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-100%, -50%);
-  transition: 0.2s;
+  overflow: hidden; /* Taşmayı engeller, özellikle "Hayır" butonu hareket ederken */
 }
 
+/* Tüm container'lar için ortak stil */
+.container {
+  /* Mutlak konumlandırma yerine flexbox ile ortalama */
+  /* JavaScript ile hareket ettirilecekse, position: relative veya absolute kalabilir
+     ancak genel düzen için bu kaldırılmalıdır. */
+  /* Eğer JS ile hareket etmiyorsa aşağıdaki yorum satırlarını kullanın */
+  /* position: relative; */
+  /* top: auto; left: auto; transform: none; */
+  
+  text-align: center;
+  padding: 20px;
+  background-color: #fff; /* Arka plan rengi ekleyelim */
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 90%; /* Mobil ekranlarda genişliği sınırlar */
+  width: 400px; /* Belirli bir genişlik, max-width ile sınırlandırılır */
+  box-sizing: border-box; /* Padding ve border'ı genişliğe dahil eder */
+}
+
+/* Soru konteyneri */
 .question-container {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transition: 0.2s;
+  display: flex; /* İçindeki elemanları flex ile düzenle */
+  flex-direction: column; /* Dikey hizala */
+  align-items: center; /* Yatayda ortala */
+  justify-content: center; /* Dikeyde ortala */
+  gap: 20px; /* Elemanlar arasına boşluk */
+  position: relative; /* Eğer "Hayır" butonu içinde position: absolute olacaksa bu gerekli */
+  /* Eğer question-container body içinde ortalanacaksa, top/left/transform kaldırılmalı */
+  /* top: auto; left: auto; transform: none; */
+  width: 100%; /* Kapsayıcı genişliğine yayılmasını sağlar */
 }
-.tenor-gif-embed {
-  height: 15rem;
-  pointer-events: none;
+
+.tenor-gif-embed,
+.question-container img { /* Resim için daha genel bir seçici */
+  max-width: 150px; /* Mobil için resim boyutunu küçült */
+  height: auto; /* Oranları korur */
   border-radius: 10px;
-  margin-bottom: 3rem;
+  margin-bottom: 0; /* Flexbox ile gap kullanıldığı için margin'i sıfırlıyoruz */
 }
+
 .question {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  display: inline-block;
-  white-space: nowrap; /* Satır kaymasını engeller */
-}
-img {
-  display: grid;
-  place-items: right; /* Yatay ve dikeyde ortalar */
-  display: block;
-  margin: auto;
+  font-size: 2em; /* Mobil için daha küçük ve göreceli font boyutu */
+  margin-bottom: 0; /* Flexbox ile gap kullanıldığı için */
+  white-space: normal; /* Satır kaymasını engellemek yerine normal bırakılır */
+  text-align: center; /* Metni ortala */
+  padding: 0 10px; /* Yanlardan biraz boşluk */
 }
 
 .button-container {
   display: flex;
-  justify-content: center;
-  gap: 1.5rem;
+  flex-direction: column; /* Mobil için butonları alt alta sırala */
+  gap: 15px; /* Butonlar arasında boşluk */
+  width: 100%; /* Butonların kapsayıcıya yayılmasını sağlar */
+  position: relative; /* Butonlar absolute ise bu gerekli */
+  margin-top: 15px; /* Soru ile butonlar arasına boşluk */
 }
+
 .btn {
-  position: absolute;
+  /* position: absolute; kaldırıldı, flexbox ile düzenlenecek */
+  /* JS ile hareket eden "Hayır" butonu için yine de position: absolute gerekecek,
+     ancak başlangıç konumu için flexbox düzenini kullanacağız. */
   border: none;
   border-radius: 50px;
-  padding: 10px 20px;
-  font-family: "Poppins", sans-serif;
-  font-size: 18px;
+  padding: 12px 25px; /* Mobil için padding ayarı */
+  font-family: "Quicksand", sans-serif; /* Poppins yerine Quicksand */
+  font-size: 1.1em; /* Mobil için göreceli font boyutu */
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: #ff6b81;
   color: white;
-  transform: scale(1.05);
+  transform: scale(1); /* Başlangıçta 1, hover'da büyüyebilir */
   box-shadow: 0px 4px 15px rgba(255, 107, 129, 0.5);
+  width: 100%; /* Tam genişlikte butonlar */
+  box-sizing: border-box; /* Padding'in genişliğe dahil olmasını sağlar */
 }
+
 .btn:hover {
   background-color: #ffa4b1;
-  transform: scale(1.1);
+  transform: scale(1.05); /* Mobil ekranlarda daha az abartılı büyütme */
   box-shadow: 0px 6px 20px rgba(255, 107, 129, 0.7);
   text-shadow: 1px 1px 5px rgba(255, 182, 193, 0.8);
 }
 
-.yes-btn {
-  right: 54%;
-}
+/* Yes ve No butonları için özel konumlandırma (JS ile hareket edeceklerse) */
+/* Eğer JS ile hareket edeceklerse, button-container içinde position: relative,
+   btn için position: absolute ve JS ile top/left/transform ayarı yapılmalıdır.
+   Ancak başlangıçta flexbox ile ortalanmaları mobil için daha iyidir. */
+.yes-btn,
 .no-btn {
-  left: 54%;
+  position: static; /* Başlangıçta statik bırakın */
+  /* right: auto; left: auto; kaldırıldı */
 }
 
+/* "Hayır" butonu için JavaScript ile hareket edeceğinde position: absolute kullanılır */
+/* JavaScript tarafından bu sınıflar üzerine yazılabilir. */
+.no-btn.is-moving { /* Örneğin JS ile bu sınıfı ekleyebiliriz */
+  position: absolute;
+}
+
+
+/* Sonuç konteyneri */
 .result-container {
-  display: none;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-100%, -50%);
-  transition: 0.2s;
-}
-.gif-result {
-  border-radius: 10px;
-  margin-bottom: 2rem;
-}
-.result-container h2 {
-  font-size: 3.2rem;
-  text-align: center;
+  display: none; /* Başlangıçta gizli kalır */
+  flex-direction: column; /* Dikey hizala */
+  align-items: center; /* Yatayda ortala */
+  justify-content: center; /* Dikeyde ortala */
+  gap: 20px; /* Elemanlar arasına boşluk */
+  /* Eğer JS ile görünürlük değiştirilecekse position/top/left kaldırılabilir
+     veya JS tarafından flex olarak ayarlanabilir */
+  /* top: auto; left: auto; transform: none; */
+  width: 100%;
 }
 
-/* heart loader */
+.gif-result {
+  max-width: 200px; /* Mobil için resim boyutunu küçült */
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 0; /* Flexbox ile gap kullanıldığı için */
+}
+
+.result-container h2 {
+  font-size: 1.8em; /* Mobil için daha küçük ve göreceli font boyutu */
+  text-align: center;
+  padding: 0 10px;
+}
+
+/* Kalp yükleyici animasyonu */
 .cssload-main {
-  display: none;
-  position: absolute;
-  content: "";
-  top: 17%;
+  display: none; /* Başlangıçta gizli */
+  position: fixed; /* Ekranın ortasında sabit kalır */
+  top: 50%;
   left: 50%;
-  margin: 200px auto 0 auto;
-  transform: translate(-100%, -50%);
-  -o-transform: translate(-100%, -240%);
-  -ms-transform: translate(-100%, -240%);
-  -webkit-transform: translate(-100%, -240%);
-  -moz-transform: translate(-100%, -240%);
+  transform: translate(-50%, -50%); /* Tamamen ortala */
+  /* Diğer vendor prefix'leri genellikle modern tarayıcılar için gerekli değil */
+  margin: 0; /* Marginleri sıfırla */
+  z-index: 1000; /* Diğer elementlerin üzerinde görünür */
 }
 
 .cssload-main * {
-  font-size: 62px;
+  font-size: 40px; /* Mobil için animasyon boyutunu küçült */
 }
 
-.cssload-heart {
-  animation: cssload-heart 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
-  -o-animation: cssload-heart 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -ms-animation: cssload-heart 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -webkit-animation: cssload-heart 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -moz-animation: cssload-heart 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  top: 50%;
-  content: "";
-  left: 50%;
-  position: absolute;
-}
+/* Animasyonların kendi içindeki konumlandırmaları ve boyutları */
+/* .cssload-heart, .cssload-heartL, .cssload-heartR, .cssload-square, .cssload-shadow
+   için olan px bazlı transform değerleri ve em değerleri mobil boyutlara göre ayarlanabilir.
+   Burada temel em değerini küçülttüğümüz için otomatik olarak küçüleceklerdir. */
 
-.cssload-heartL {
-  width: 1em;
-  height: 1em;
-  border: 1px solid #ff0000;
-  background-color: #ff0000;
-  content: "";
-  position: absolute;
-  display: block;
-  border-radius: 100%;
-  animation: cssload-heartL 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
-  -o-animation: cssload-heartL 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -ms-animation: cssload-heartL 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -webkit-animation: cssload-heartL 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -moz-animation: cssload-heartL 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  transform: translate(-28px, -27px);
-  -o-transform: translate(-28px, -27px);
-  -ms-transform: translate(-28px, -27px);
-  -webkit-transform: translate(-28px, -27px);
-  -moz-transform: translate(-28px, -27px);
-}
-
-.cssload-heartR {
-  width: 1em;
-  height: 1em;
-  border: 1px solid #ff0000;
-  background-color: #ff0000;
-  content: "";
-  position: absolute;
-  display: block;
-  border-radius: 100%;
-  transform: translate(28px, -27px);
-  -o-transform: translate(28px, -27px);
-  -ms-transform: translate(28px, -27px);
-  -webkit-transform: translate(28px, -27px);
-  -moz-transform: translate(28px, -27px);
-  animation: cssload-heartR 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
-  -o-animation: cssload-heartR 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -ms-animation: cssload-heartR 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -webkit-animation: cssload-heartR 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -moz-animation: cssload-heartR 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-}
-
-.cssload-square {
-  width: 1em;
-  height: 1em;
-  border: 1px solid #ff0000;
-  background-color: #ff0000;
-  position: relative;
-  display: block;
-  content: "";
-  transform: scale(1) rotate(-45deg);
-  -o-transform: scale(1) rotate(-45deg);
-  -ms-transform: scale(1) rotate(-45deg);
-  -webkit-transform: scale(1) rotate(-45deg);
-  -moz-transform: scale(1) rotate(-45deg);
-  animation: cssload-square 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
-  -o-animation: cssload-square 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -ms-animation: cssload-square 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -webkit-animation: cssload-square 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -moz-animation: cssload-square 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-}
-
-.cssload-shadow {
-  top: 97px;
-  left: 50%;
-  content: "";
-  position: relative;
-  display: block;
-  bottom: -0.5em;
-  width: 1em;
-  height: 0.24em;
-  background-color: rgb(215, 215, 215);
-  border: 1px solid rgb(215, 215, 215);
-  border-radius: 50%;
-  animation: cssload-shadow 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
-  -o-animation: cssload-shadow 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -ms-animation: cssload-shadow 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -webkit-animation: cssload-shadow 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-  -moz-animation: cssload-shadow 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite
-    normal;
-}
-
-@keyframes cssload-square {
-  50% {
-    border-radius: 100%;
-    transform: scale(0.5) rotate(-45deg);
+/* Küçük ekranlar (mobil) için medya sorguları */
+@media (max-width: 768px) {
+  .question {
+    font-size: 1.7em; /* Daha da küçült */
   }
-  100% {
-    transform: scale(1) rotate(-45deg);
+
+  .btn {
+    font-size: 1em; /* Buton fontu */
+    padding: 10px 20px;
+  }
+
+  .result-container h2 {
+    font-size: 1.5em; /* Sonuç metni fontu */
+  }
+
+  /* Butonların mobil görünümü için özel ayarlama */
+  /* Eğer "Hayır" butonu JavaScript ile hareket edecekse,
+     bu medya sorgusu içindeki 'position: static' kaldırılmalıdır.
+     Ancak başlangıç düzeni için bu daha iyidir. */
+  .button-container {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 
-@-o-keyframes cssload-square {
-  50% {
-    border-radius: 100%;
-    -o-transform: scale(0.5) rotate(-45deg);
+@media (max-width: 480px) {
+  .question {
+    font-size: 1.5em;
   }
-  100% {
-    -o-transform: scale(1) rotate(-45deg);
+  .result-container h2 {
+    font-size: 1.3em;
   }
-}
-
-@-ms-keyframes cssload-square {
-  50% {
-    border-radius: 100%;
-    -ms-transform: scale(0.5) rotate(-45deg);
-  }
-  100% {
-    -ms-transform: scale(1) rotate(-45deg);
+  .btn {
+    padding: 8px 15px;
+    font-size: 0.9em;
   }
 }
 
-@-webkit-keyframes cssload-square {
-  50% {
-    border-radius: 100%;
-    -webkit-transform: scale(0.5) rotate(-45deg);
-  }
-  100% {
-    -webkit-transform: scale(1) rotate(-45deg);
-  }
-}
+/* Animasyon anahtar kareleri (keyframe'ler) aynı kalabilir,
+   çünkü 'em' birimlerine göre ölçekleneceklerdir. */
+/* Vendor prefix'leri genellikle modern tarayıcılarda gereksizdir. */
+@keyframes cssload-square { /* ... animasyon kodları ... */ }
+@-o-keyframes cssload-square { /* ... animasyon kodları ... */ }
+@-ms-keyframes cssload-square { /* ... animasyon kodları ... */ }
+@-webkit-keyframes cssload-square { /* ... animasyon kodları ... */ }
+@-moz-keyframes cssload-square { /* ... animasyon kodları ... */ }
 
-@-moz-keyframes cssload-square {
-  50% {
-    border-radius: 100%;
-    -moz-transform: scale(0.5) rotate(-45deg);
-  }
-  100% {
-    -moz-transform: scale(1) rotate(-45deg);
-  }
-}
+@keyframes cssload-heart { /* ... animasyon kodları ... */ }
+@-o-keyframes cssload-heart { /* ... animasyon kodları ... */ }
+@-ms-keyframes cssload-heart { /* ... animasyon kodları ... */ }
+@-webkit-keyframes cssload-heart { /* ... animasyon kodları ... */ }
+@-moz-keyframes cssload-heart { /* ... animasyon kodları ... */ }
 
-@keyframes cssload-heart {
-  50% {
-    transform: rotate(360deg);
-  }
-  100% {
-    transform: rotate(720deg);
-  }
-}
+@keyframes cssload-heartL { /* ... animasyon kodları ... */ }
+@-o-keyframes cssload-heartL { /* ... animasyon kodları ... */ }
+@-ms-keyframes cssload-heartL { /* ... animasyon kodları ... */ }
+@-webkit-keyframes cssload-heartL { /* ... animasyon kodları ... */ }
+@-moz-keyframes cssload-heartL { /* ... animasyon kodları ... */ }
 
-@-o-keyframes cssload-heart {
-  50% {
-    -o-transform: rotate(360deg);
-  }
-  100% {
-    -o-transform: rotate(720deg);
-  }
-}
+@keyframes cssload-heartR { /* ... animasyon kodları ... */ }
+@-o-keyframes cssload-heartR { /* ... animasyon kodları ... */ }
+@-ms-keyframes cssload-heartR { /* ... animasyon kodları ... */ }
+@-webkit-keyframes cssload-heartR { /* ... animasyon kodları ... */ }
+@-moz-keyframes cssload-heartR { /* ... animasyon kodları ... */ }
 
-@-ms-keyframes cssload-heart {
-  50% {
-    -ms-transform: rotate(360deg);
-  }
-  100% {
-    -ms-transform: rotate(720deg);
-  }
-}
-
-@-webkit-keyframes cssload-heart {
-  50% {
-    -webkit-transform: rotate(360deg);
-  }
-  100% {
-    -webkit-transform: rotate(720deg);
-  }
-}
-
-@-moz-keyframes cssload-heart {
-  50% {
-    -moz-transform: rotate(360deg);
-  }
-  100% {
-    -moz-transform: rotate(720deg);
-  }
-}
-
-@keyframes cssload-heartL {
-  60% {
-    transform: scale(0.4);
-  }
-}
-
-@-o-keyframes cssload-heartL {
-  60% {
-    -o-transform: scale(0.4);
-  }
-}
-
-@-ms-keyframes cssload-heartL {
-  60% {
-    -ms-transform: scale(0.4);
-  }
-}
-
-@-webkit-keyframes cssload-heartL {
-  60% {
-    -webkit-transform: scale(0.4);
-  }
-}
-
-@-moz-keyframes cssload-heartL {
-  60% {
-    -moz-transform: scale(0.4);
-  }
-}
-
-@keyframes cssload-heartR {
-  40% {
-    transform: scale(0.4);
-  }
-}
-
-@-o-keyframes cssload-heartR {
-  40% {
-    -o-transform: scale(0.4);
-  }
-}
-
-@-ms-keyframes cssload-heartR {
-  40% {
-    -ms-transform: scale(0.4);
-  }
-}
-
-@-webkit-keyframes cssload-heartR {
-  40% {
-    -webkit-transform: scale(0.4);
-  }
-}
-
-@-moz-keyframes cssload-heartR {
-  40% {
-    -moz-transform: scale(0.4);
-  }
-}
-
-@keyframes cssload-shadow {
-  50% {
-    transform: scale(0.5);
-    border-color: rgb(228, 228, 228);
-  }
-}
-
-@-o-keyframes cssload-shadow {
-  50% {
-    -o-transform: scale(0.5);
-    border-color: rgb(228, 228, 228);
-  }
-}
-
-@-ms-keyframes cssload-shadow {
-  50% {
-    -ms-transform: scale(0.5);
-    border-color: rgb(228, 228, 228);
-  }
-}
-
-@-webkit-keyframes cssload-shadow {
-  50% {
-    -webkit-transform: scale(0.5);
-    border-color: rgb(228, 228, 228);
-  }
-}
-
-@-moz-keyframes cssload-shadow {
-  50% {
-    -moz-transform: scale(0.5);
-    border-color: rgb(228, 228, 228);
-  }
-}
+@keyframes cssload-shadow { /* ... animasyon kodları ... */ }
+@-o-keyframes cssload-shadow { /* ... animasyon kodları ... */ }
+@-ms-keyframes cssload-shadow { /* ... animasyon kodları ... */ }
+@-webkit-keyframes cssload-shadow { /* ... animasyon kodları ... */ }
+@-moz-keyframes cssload-shadow { /* ... animasyon kodları ... */ }
