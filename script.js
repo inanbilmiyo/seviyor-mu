@@ -7,21 +7,20 @@ const noBtn = document.querySelector(".js-no-btn");
 // "Hayır" düğmesinin pozisyonunu rastgele değiştiren fonksiyon
 const moveNoButton = () => {
   // questionContainer'ın güncel boyutlarını ve konumunu al
+  // getBoundingClientRect() en güvenilir yöntemdir.
   const containerRect = questionContainer.getBoundingClientRect();
   // noBtn'in güncel boyutlarını al
   const noBtnRect = noBtn.getBoundingClientRect();
 
-  // Butonun hareket edebileceği maksimum X ve Y koordinatlarını hesapla
+  // Butonun hareket edebileceği maksimum X ve Y koordinatlarını hesapla.
   // Bu hesaplama, butonun container içinde kalmasını garanti eder.
-  // containerRect.width ve containerRect.height, container'ın iç genişliğini verir.
-  // noBtnRect.width ve noBtnRect.height, butonun kendi genişliğini verir.
-  // Böylece butonun sol üst köşesi için maksimum konumları buluruz.
+  // Butonun sağ ve alt kenarının container'ın sağ ve alt kenarına değmesini sağlar.
   const maxX = containerRect.width - noBtnRect.width;
   const maxY = containerRect.height - noBtnRect.height;
 
   // Yeni rastgele konumlar (0 ile maxX/maxY arasında)
-  // Math.max(0, ...) kullanarak konumların negatif olmamasını sağlıyoruz
-  // ve böylece butonun sol veya üst kenardan dışarı çıkmasını engelliyoruz.
+  // Math.max(0, ...) kullanarak konumların negatif olmamasını sağlıyoruz,
+  // böylece butonun sol veya üst kenardan dışarı çıkmasını engelliyoruz.
   const newX = Math.max(0, Math.random() * maxX);
   const newY = Math.max(0, Math.random() * maxY);
 
@@ -29,15 +28,13 @@ const moveNoButton = () => {
   // CSS'te `position: relative` olan `.question-container` içinde
   // `position: absolute` ile buton konumlandırılır.
   noBtn.style.position = 'absolute';
-  // Butonun sol üst köşesini doğrudan bu yeni X ve Y konumlarına ayarla
-  noBtn.style.left = `${newX}px`;
-  noBtn.style.top = `${newY}px`;
   
-  // NOT: Eğer `transform: translate` kullanmayı tercih ederseniz,
-  // butonun başlangıç pozisyonunu dikkate almanız gerekir.
-  // Ancak `left` ve `top` doğrudan CSS kurallarına çevrildiği için
-  // genellikle daha basit ve öngörülebilir bir davranış sağlar.
-  // noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
+  // transform: translate() kullanarak butonun konumunu değiştiriyoruz.
+  // Bu, tarayıcı tarafından daha optimize edilmiş bir hareket sağlar.
+  noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
+
+  // Gerekirse, butonun z-index'ini de ayarlayabiliriz
+  // noBtn.style.zIndex = '10';
 };
 
 // "Hayır" düğmesine fare üzerine gelince ve dokununca kaçma özelliği
@@ -58,9 +55,11 @@ yesBtn.addEventListener("click", () => {
   }
 });
 
-// Sayfa yüklendiğinde "Hayır" butonunun başlangıç pozisyonunu ayarlayalım
-// ve 'absolute' olarak işaretleyelim ki sonradan hareket edebilsin.
-// Bu, butonun sayfa ilk yüklendiğinde de doğru konumlanmasını sağlar.
-// noBtn.style.position = 'absolute'; // Bu satırın `moveNoButton` içinde olması daha iyi
-// noBtn.style.left = `${(questionContainer.offsetWidth - noBtn.offsetWidth) / 2}px`; // Ortala
-// noBtn.style.top = `${(questionContainer.offsetHeight - noBtn.offsetHeight) / 2}px`; // Ortala
+// Sayfa yüklendiğinde ve ekran boyutu değiştiğinde (mobil klavye açılması gibi)
+// butonun pozisyonunu yeniden ayarlamak için bir olay dinleyicisi ekleyebiliriz.
+// Bu, butonun her zaman doğru sınırlar içinde kalmasına yardımcı olur.
+window.addEventListener('resize', moveNoButton);
+
+// Sayfa yüklendiğinde butonun başlangıç pozisyonunu da ayarlayalım
+// Bu, sayfa ilk açıldığında butonun rastgele bir yerde başlamasını sağlar.
+document.addEventListener('DOMContentLoaded', moveNoButton);
