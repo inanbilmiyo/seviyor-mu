@@ -4,42 +4,54 @@ const gifResult = document.querySelector(".gif-result");
 const yesBtn = document.querySelector(".js-yes-btn");
 const noBtn = document.querySelector(".js-no-btn");
 
+// Bu bayrak, 'Hayır' butonunun zaten mutlak konumlandırılıp konumlandırılmadığını kontrol eder
+let isNoButtonAbsolute = false;
+
 // "Hayır" düğmesinin pozisyonunu rastgele değiştiren fonksiyon
 const moveNoButton = () => {
+  // Buton ilk kez hareket ettirildiğinde, CSS sınıfını ekleyelim
+  if (!isNoButtonAbsolute) {
+    noBtn.classList.add('is-absolute-positioned');
+    isNoButtonAbsolute = true;
+    // Butonun yeni absolute pozisyonuna geçişi için kısa bir gecikme ver
+    // (opsiyonel ama daha akıcı bir başlangıç sağlayabilir)
+    setTimeout(() => {
+      moveNoButtonLogic(); // Gecikmeden sonra asıl hareket mantığını çalıştır
+    }, 50); 
+  } else {
+    moveNoButtonLogic(); // Zaten absolute ise direkt hareket ettir
+  }
+};
+
+const moveNoButtonLogic = () => {
   // questionContainer'ın güncel boyutlarını ve konumunu al
-  // getBoundingClientRect() en güvenilir yöntemdir.
   const containerRect = questionContainer.getBoundingClientRect();
   // noBtn'in güncel boyutlarını al
   const noBtnRect = noBtn.getBoundingClientRect();
 
-  // Butonun hareket edebileceği maksimum X ve Y koordinatlarını hesapla.
-  // Bu hesaplama, butonun container içinde kalmasını garanti eder.
-  // Butonun sağ ve alt kenarının container'ın sağ ve alt kenarına değmesini sağlar.
-  const maxX = containerRect.width - noBtnRect.width;
-  const maxY = containerRect.height - noBtnRect.height;
+  // Konteynerın içindeki güvenli hareket alanını belirleyelim.
+  // Biraz boşluk bırakarak düğmenin kenarlara yapışmasını engelleriz.
+  const padding = 20; 
 
-  // Yeni rastgele konumlar (0 ile maxX/maxY arasında)
-  // Math.max(0, ...) kullanarak konumların negatif olmamasını sağlıyoruz,
-  // böylece butonun sol veya üst kenardan dışarı çıkmasını engelliyoruz.
-  const newX = Math.max(0, Math.random() * maxX);
-  const newY = Math.max(0, Math.random() * maxY);
+  const maxX = containerRect.width - noBtnRect.width - padding * 2;
+  const maxY = containerRect.height - noBtnRect.height - padding * 2;
+
+  // Yeni rastgele konumlar (padding kadar içeriden başlar)
+  // Math.max(0, ...) ve Math.min(max, ...) ile butonun her zaman sınırlar içinde kalmasını garanti ediyoruz.
+  const newX = Math.min(Math.max(0, Math.random() * maxX), maxX);
+  const newY = Math.min(Math.max(0, Math.random() * maxY), maxY);
 
   // Butonun pozisyonunu güncelliyoruz
-  // CSS'te `position: relative` olan `.question-container` içinde
-  // `position: absolute` ile buton konumlandırılır.
-  noBtn.style.position = 'absolute';
-  
-  // transform: translate() kullanarak butonun konumunu değiştiriyoruz.
-  // Bu, tarayıcı tarafından daha optimize edilmiş bir hareket sağlar.
-  noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
-
-  // Gerekirse, butonun z-index'ini de ayarlayabiliriz
-  // noBtn.style.zIndex = '10';
+  // CSS'te `position: absolute` olan `.question-container` içinde
+  // `transform: translate()` ile buton konumlandırılır.
+  // translateX ve translateY, padding kadar içeriden başlar.
+  noBtn.style.transform = `translate(${newX + padding}px, ${newY + padding}px)`;
 };
+
 
 // "Hayır" düğmesine fare üzerine gelince ve dokununca kaçma özelliği
 noBtn.addEventListener("mouseover", moveNoButton);
-noBtn.addEventListener("touchstart", moveNoButton); // Mobil cihazlar için dokunma olayı
+noBtn.addEventListener("touchstart", moveNoButton);
 
 // "Evet" düğmesi işlevi
 yesBtn.addEventListener("click", () => {
@@ -58,8 +70,18 @@ yesBtn.addEventListener("click", () => {
 // Sayfa yüklendiğinde ve ekran boyutu değiştiğinde (mobil klavye açılması gibi)
 // butonun pozisyonunu yeniden ayarlamak için bir olay dinleyicisi ekleyebiliriz.
 // Bu, butonun her zaman doğru sınırlar içinde kalmasına yardımcı olur.
-window.addEventListener('resize', moveNoButton);
+window.addEventListener('resize', () => {
+    // Sadece questionContainer görünürken butonu hareket ettir
+    if (questionContainer.style.display !== 'none') {
+        moveNoButton();
+    }
+});
 
 // Sayfa yüklendiğinde butonun başlangıç pozisyonunu da ayarlayalım
 // Bu, sayfa ilk açıldığında butonun rastgele bir yerde başlamasını sağlar.
-document.addEventListener('DOMContentLoaded', moveNoButton);
+document.addEventListener('DOMContentLoaded', () => {
+    // İlk yüklendiğinde hemen absolute yapalım ve rastgele konuma gitsin
+    noBtn.classList.add('is-absolute-positioned');
+    isNoButtonAbsolute = true;
+    moveNoButtonLogic();
+});
